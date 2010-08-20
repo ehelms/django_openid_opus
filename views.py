@@ -4,9 +4,9 @@ from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+
+from django_openid_opus.util import get_url_host, begin_openid, get_return_url
 
 from opus.lib import log
 log = log.getLogger()
@@ -14,17 +14,15 @@ log = log.getLogger()
 
 def openid_login(request, redirect_to=None):
     openid_url = request.POST['openid_url']
-    resource_redirect_url = request.POST['next']
-    log.debug(resource_redirect_url)
-    institution = authentication_tools.get_institution(request)
+    next = request.POST['next']
     session = request.session
 
-    trust_root = authentication_tools.get_url_host(request)
+    trust_root = get_url_host(request)
+    
     if not redirect_to:
-        redirect_url = openid_tools.begin_openid(session, trust_root, openid_url, resource_redirect_url)
+        redirect_url = begin_openid(session, trust_root, openid_url, next)
     else:
-        log.debug(redirect_to)
-        redirect_url = openid_tools.begin_openid(session, trust_root, openid_url, resource_redirect_url, redirect_to)
+        redirect_url = begin_openid(session, trust_root, openid_url, next, redirect_to)
 
     if not redirect_url:
         return HttpResponse('The OpenID was invalid')
@@ -33,21 +31,21 @@ def openid_login(request, redirect_to=None):
 
 
 def openid_login_complete(request):
-    institution = authentication_tools.get_institution(request)
-    resource_redirect_url = request.GET['next']
+    next = request.GET['next']
     session = request.session
     
-    host = authentication_tools.get_url_host(request)
+    host = get_url_host(request)
     nonce = request.GET['janrain_nonce']
+    
     if not "" == settings.OPENID_COMPLETE_URL:
-        url = openid_tools.get_return_url(host, nonce, settings.OPENID_COMPLETE_URL)
+        url = get_return_url(host, nonce, settings.OPENID_COMPLETE_URL)
     else:
-        url = openid_tools.get_return_url(host, nonce)
+        url = get_return_url(host, nonce)
     
     query_dict = dict([
         (k.encode('utf8'), v.encode('utf8')) for k, v in request.GET.items()])
     
-    status, username = openid_tools.complete_openid(session, query_dict, url)
+    status, username = complete_openid(session, query_dict, url)
 
     if status == "SUCCESS":
         username = username
@@ -55,7 +53,6 @@ def openid_login_complete(request):
         if user is not None:
             log.debug("Logging user in")
             login(request, user)
-            authentication_tools.add_session_username(request, username.split('@')[0])
             log.debug("Redirecting to " + resource_redirect_url)
             return HttpResponseRedirect(resource_redirect_url)
         else:
@@ -84,15 +81,10 @@ def openid_login_complete(request):
 
 @login_required
 def logout_view(request, template_name=None, redirect_url=None, redirect_viewname=None):
-    try:
-        del request.session['username']
-    except KeyError:
-        pass
     logout(request)
-    #institution = authentication_tools.get_institution(request)
     
     if not template_name:
-        template_name = 'idpauth/logout.html'
+        template_name = "django_openid_opus/logout.html"
 
     if "next" in request.GET:
             next = request.GET['next']
