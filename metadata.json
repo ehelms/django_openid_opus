@@ -1,6 +1,9 @@
 {
     "settings" : {
         "LOGIN_URL" : "/openid/login/",
+        "AUTHENTICATION_BACKENDS" : ["django_openid_opus.backend.OpenIDBackend"],
+        "TEMPLATE_CONTEXT_PROCESSORs" : ['django_openid_opus.context_processors.context_processor'],
+        "DJANGO_OPENID_MEDIA_PREFIX" : "/media/django_openid_opus/"
     },
     "usersettings" : [
     ]
