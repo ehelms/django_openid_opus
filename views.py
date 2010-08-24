@@ -13,7 +13,7 @@ from opus.lib import log
 log = log.getLogger()
 
 
-def openid_login(request, template_name="django_ldap_opus/login.html"):
+def openid_login(request, template_name="django_openid_opus/login.html"):
     if "next" in request.REQUEST:
             next = request.REQUEST['next']
     else:
