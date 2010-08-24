@@ -1,0 +1,11 @@
+{% extends "django_openid_opus/base.html" %}
+{% block content %}
+<div class="content">
+    <p>Logged in as: <font color='red'>{{ user.username }}</font></p>
+    {% if user.is_authenticated %}
+        <p><a href="{% url openid_logout_url %}">Logout</a></p>
+    {% else %}
+        <p><a href="{% url openid_login_url %}">Login</a></p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,8 +1,8 @@
-{% extends "idpauth/base.html" %}
+{% extends "django_openid_opus/base.html" %}
 {% block title %}Logout{% endblock %}
 
 {% block content %}
-
+<div class="content">
 <p>You have been successfully logged out.</p>
 {% if next %}
 <form action="{{ next }}" method="GET">
@@ -10,8 +10,9 @@
     </form>
 
 {% else %}
-    <form action="/idpauth/login/" method="GET">
+<form action="{% url openid_login_url %}" method="GET">
         <input type="submit" value="Return to Login page." />
     </form>
     {% endif %}
+</div>
 {% endblock %}

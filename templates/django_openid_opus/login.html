@@ -1,0 +1,45 @@
+{% extends "django_openid_opus/base.html" %}
+{% block title %}Login{% endblock %}
+{% block extra-style %} 
+    img {
+        width: 164px;
+        height: 48px;
+        border: none;
+        border-radius: 30px;
+        -moz-border-radius: 30px;
+    }
+    button {
+        border: 2px solid #CCC;
+        border-radius: 30px;
+        -moz-border-radius: 30px;
+        cursor: hand;
+    }
+{% endblock extra-style %}
+
+{% block content %}
+<p>
+    <font color="red" size="2.5em">
+        {{ message }}
+    </font>
+</p>
+<div class="content">
+    <p><img style="width:32px;height:32px;" src="{{ DJANGO_OPENID_OPUS_MEDIA_PREFIX }}openID_icon.png" />OpenID Login</p>
+    <form action="{% url openid_login_url %}" method="post">
+        <button name="openid_url"
+                value="https://www.google.com/accounts/o8/id"
+                class="openid"
+                type="submit">
+                <img src="{{ DJANGO_OPENID_OPUS_MEDIA_PREFIX }}google_icon.png" alt="google account" />
+        </button>
+        <button
+            name="openid_url"
+            value="yahoo.com"
+            class="openid"
+            type="submit">
+            <img src="http://l.yimg.com/a/i/reg/openid/buttons/9.png" alt="yahoo account" />
+        </button>
+        <input type="hidden" name="next" value="{{ next }}" />
+        {% csrf_token %}
+    </form>
+</div>
+{% endblock %}

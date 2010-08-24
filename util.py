@@ -1,5 +1,7 @@
 from django.utils.html import escape
 from django.http import get_host
+from django.conf import settings
+from django.core.urlresolvers import reverse
 
 import time 
 import base64
@@ -14,14 +16,13 @@ from openid.consumer.consumer import Consumer, \
 from openid.yadis import xri
 from openid.consumer.discover import DiscoveryFailure
 
+from django_openid_opus.models import Association, Nonce
 
-def begin_openid(session, trust_root, openid_url, resource_redirect_url, redirect_to=None):
-    if not redirect_to:
-        redirect_to = trust_root + '/idpauth/openid_login_complete/' + '?next=' + resource_redirect_url
-    else:
-        redirect_to = trust_root + '/' + redirect_to + '?next=' + resource_redirect_url
+OPENID_AX = [{"type_uri" : "http://axschema.org/contact/email", "count" : 1, "required" : True, "alias" : "email"}]
+
+def begin_openid(session, trust_root, openid_url, resource_redirect_url):
+    redirect_to = trust_root + '/openid/login/complete/' + '?next=' + resource_redirect_url
     
-    log.debug(redirect_to)
     consumer = Consumer(session, DjangoOpenIDStore())
     
     try:
@@ -50,9 +51,8 @@ def complete_openid(session, query_dict, url):
 
 
 def set_attributes(auth_request):
-    requested_attributes = getattr(settings, 'OPENID_AX', False)
+    requested_attributes = OPENID_AX
     if requested_attributes:
-        log.debug("AX true")
         ax_request = oidax.FetchRequest()
         for i in requested_attributes:
             ax_request.add(oidax.AttrInfo(i['type_uri'], i['count'], i['required'], i['alias']))
@@ -73,12 +73,14 @@ def get_full_url(request):
     return get_url_host(request) + request.get_full_path()
 
 
-def get_return_url(host, nonce, return_url=None):
-    if not return_url:
-        url = (host + '/idpauth/openid_login_complete/').encode('utf8')     
-    else:
-        url = (host + '/' + return_url).encode('utf8')
+def get_return_url(host, nonce):
+    url = (host + '/openid/login/complete/').encode('utf8')     
     return url
+
+
+def is_valid_next_url(request, next):
+    absolute_uri = request.build_absolute_uri(next)
+    return absolute_uri != next
 
 
 def from_openid_response(openid_response):
@@ -92,7 +94,7 @@ def from_openid_response(openid_response):
     if getattr(settings, 'OPENID_SREG', False):
         openid.sreg = oidsreg.SRegResponse.fromSuccessResponse(openid_response)
 
-    if getattr(settings, 'OPENID_AX', False):
+    if OPENID_AX:
         openid.ax = oidax.FetchResponse.fromSuccessResponse(openid_response)
 
     return openid

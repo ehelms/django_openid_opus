@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>{% block title %}{% endblock title %}</title>
+        <style>
+            {% block extra-style %}
+            {% endblock extra-style %}
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            p {
+                margin: 20px auto;
+                color: black;
+                font-weight: bold;
+                text-align: center;
+                font-size: 1.25em;
+            }
+            .content {
+                margin: 300px auto;
+                width: 20%;
+                border-radius: 5px;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+            }
+            .button{
+                margin: 10px 0 0 65px;
+            }
+        </style>
+    </head>
+    <body>
+        {% block content %}
+        {% endblock content %}
+    </body>
+</html>

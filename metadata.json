@@ -1,8 +1,8 @@
 {
     "settings" : {
+        "LOGIN_URL" : "/openid/login/",
     },
     "usersettings" : [
-        ["LOGIN_URL", "This is the login redirect url.", "string", "/django_openid_opus/login/"], 
     ]
 }
 
