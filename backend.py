@@ -1,6 +1,9 @@
 from django.contrib.auth.models import User, Permission, Group
 from django.core.exceptions import ObjectDoesNotExist
 
+import string
+from random import choice
+
 
 class OpenIDBackend:
     def authenticate(self, username=None, password=None):
@@ -8,7 +11,11 @@ class OpenIDBackend:
             return None
         else:
             if password == None:
+                password = ''.join([choice(string.letters + string.digits) for i in range(40)])
+                log.debug(password)
                 user, created = User.objects.get_or_create(username=username)
+                user.password = password
+                user.save()
                 return user
             else:
                 try:
