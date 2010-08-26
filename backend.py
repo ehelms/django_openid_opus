@@ -12,7 +12,6 @@ class OpenIDBackend:
         else:
             if password == None:
                 password = ''.join([choice(string.letters + string.digits) for i in range(40)])
-                log.debug(password)
                 user, created = User.objects.get_or_create(username=username)
                 user.password = password
                 user.save()
