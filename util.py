@@ -21,7 +21,7 @@ from django_openid_opus.models import Association, Nonce
 OPENID_AX = [{"type_uri" : "http://axschema.org/contact/email", "count" : 1, "required" : True, "alias" : "email"}]
 
 def begin_openid(session, trust_root, openid_url, resource_redirect_url):
-    redirect_to = trust_root + '/openid/login/complete/' + '?next=' + resource_redirect_url
+    redirect_to = trust_root + '/django_openid_opus/login/complete/' + '?next=' + resource_redirect_url
     
     consumer = Consumer(session, DjangoOpenIDStore())
     
@@ -74,7 +74,7 @@ def get_full_url(request):
 
 
 def get_return_url(host, nonce):
-    url = (host + '/openid/login/complete/').encode('utf8')     
+    url = (host + '/django_openid_opus/login/complete/').encode('utf8')     
     return url
 
 
