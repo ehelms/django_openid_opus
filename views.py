@@ -9,10 +9,6 @@ from django.core.urlresolvers import reverse
 from django_openid_opus.util import get_url_host, begin_openid, get_return_url, complete_openid
 from django_openid_opus import util
 
-from opus.lib import log
-log = log.getLogger()
-
-
 def openid_login(request, template_name="django_openid_opus/login.html"):
     if "next" in request.REQUEST:
             next = request.REQUEST['next']
