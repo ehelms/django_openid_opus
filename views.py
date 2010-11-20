@@ -13,7 +13,7 @@ def openid_login(request, template_name="django_openid_opus/login.html"):
     if "next" in request.REQUEST:
             next = request.REQUEST['next']
     else:
-        next = "/openid/test/"
+        next = settings.LOGIN_REDIRECT_URL
 
     if request.method == 'POST':
         openid_url = request.POST['openid_url']
